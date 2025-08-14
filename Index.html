@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baccarat Tracker with Card Counting</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Baccarat Tracker</h1>
+    <div class="scoreboard">
+        <div id="big-road" class="road"></div>
+        <div id="bead-plate" class="road"></div>
+    </div>
+    <div class="controls">
+        <button onclick="recordResult('P')">Player</button>
+        <button onclick="recordResult('B')">Banker</button>
+        <button onclick="recordResult('T')">Tie</button>
+        <button onclick="undo()">Undo</button>
+        <button onclick="resetGame()">Reset</button>
+    </div>
+    <div id="count-info">
+        <p>Remaining Cards: <span id="remaining-cards">0</span></p>
+        <p>Player %: <span id="player-percent">0</span>%</p>
+        <p>Banker %: <span id="banker-percent">0</span>%</p>
+        <p>Tie %: <span id="tie-percent">0</span>%</p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
