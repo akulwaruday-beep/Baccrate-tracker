@@ -1,117 +1,85 @@
-<!doctype html>
-<html lang="en">
+      <!DOCTYPE html><html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Baccarat Predictor (Qumera-style)</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baccarat Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    input { padding: 10px; font-size: 16px; width: 80%; max-width: 400px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 5px; }
+    .result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <h1>🃏 Baccarat Predictor</h1>
-    <div class="spacer"></div>
-    <a class="btn ghost" href="README.md" target="_blank">Help</a>
-  </header>
-
-  <main class="grid">
-    <!-- LEFT: controls -->
-    <section class="card">
-      <h2>Setup</h2>
-
-      <div class="row">
-        <label for="cardsTotal">Number of cards</label>
-        <select id="cardsTotal">
-          <option value="416">416 (8 decks)</option>
-          <option value="312">312 (6 decks)</option>
-          <option value="208">208 (4 decks)</option>
-          <option value="104">104 (2 decks)</option>
-          <option value="52">52 (1 deck)</option>
-        </select>
-      </div>
-
-      <div class="row">
-        <label for="simRounds">Number of rounds (simulation)</label>
-        <input id="simRounds" type="range" min="200" max="5000" step="100" value="1500" />
-        <span id="simRoundsVal" class="mono">1 500</span>
-      </div>
-
-      <h3>Enter Playing Cards</h3>
-      <p class="hint">Use baccarat values: <b>0</b>=10/J/Q/K, <b>1</b>=A, <b>2-9</b>=2-9. Separate with space or type a long string.</p>
-      <textarea id="cardsInput" rows="3" placeholder="e.g. 0 3 6 7 10 → write as 0 3 6 7 0 (since 10 counts as 0)"></textarea>
-
-      <div class="pad">
-        <div class="keypad">
-          <button data-val="0">0</button>
-          <button data-val="1">1</button>
-          <button data-val="2">2</button>
-          <button data-val="3">3</button>
-          <button data-val="4">4</button>
-          <button data-val="5">5</button>
-          <button data-val="6">6</button>
-          <button data-val="7">7</button>
-          <button data-val="8">8</button>
-          <button data-val="9">9</button>
-          <button id="keyBack" class="warn">⌫</button>
-          <button id="keyClear" class="ghost">Clear</button>
-        </div>
-      </div>
-
-      <div class="row">
-        <button id="applyCards" class="btn primary">ENTER</button>
-        <button id="undoCard" class="btn ghost">Undo last card</button>
-      </div>
-
-      <div class="stats">
-        <div class="stat"><span>Remaining in Shoe</span><b id="remaining">—</b></div>
-        <div class="stat"><span>Play Number</span><b id="playNum">0</b></div>
-      </div>
-    </section>
-
-    <!-- MIDDLE: odds + recommendation -->
-    <section class="card">
-      <h2>Odds (from current shoe)</h2>
-
-      <div class="odds">
-        <div class="odd"><span>Banker</span><b id="oddBanker">—</b></div>
-        <div class="odd"><span>Player</span><b id="oddPlayer">—</b></div>
-        <div class="odd"><span>Tie</span><b id="oddTie">—</b></div>
-      </div>
-
-      <div class="recommend">
-        <div class="label">Bet on:</div>
-        <div id="bestBet" class="best">—</div>
-        <div id="confidence" class="confidence">confidence: —</div>
-      </div>
-
-      <h3>All possible outcomes</h3>
-      <div id="allOutcomes" class="pillrow">
-        <span class="pill blue">Player</span>
-        <span class="pill red">Banker</span>
-        <span class="pill green">Tie</span>
-      </div>
-    </section>
-
-    <!-- RIGHT: history / bead plate -->
-    <section class="card">
-      <h2>History</h2>
-      <div class="row">
-        <button class="btn hist blue" data-res="P">Player</button>
-        <button class="btn hist red" data-res="B">Banker</button>
-        <button class="btn hist green" data-res="T">Tie</button>
-        <button id="undoRes" class="btn ghost">Undo</button>
-      </div>
-
-      <div id="historyText" class="mono dim">—</div>
-
-      <h3>Bead Plate</h3>
-      <div id="bead" class="bead"></div>
-    </section>
-  </main>
-
-  <footer class="foot dim">
-    <span>Made for quick baccarat analysis. For entertainment/education; no guarantees.</span>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
+  <h1>Baccarat Predictor</h1>
+  <input type="text" id="cards" placeholder="Enter past cards (0-9 separated by spaces)">
+  <div>
+    <button onclick="predict()">Predict</button>
+    <button onclick="resetShoe()">Reset</button>
+  </div>
+  <div class="result" id="result"></div>  <script>
+    let shoe = [];
+    function initShoe(decks=8) {
+      shoe = [];
+      for (let d = 0; d < decks; d++) {
+        for (let v = 0; v <= 9; v++) {
+          shoe.push(...Array(4).fill(v));
+        }
+      }
+    }
+    function removeCards(cards) {
+      cards.forEach(c => {
+        let idx = shoe.indexOf(c);
+        if (idx > -1) shoe.splice(idx, 1);
+      });
+    }
+    function simulate(rounds=1000) {
+      let pWins = 0, bWins = 0, ties = 0;
+      for (let r = 0; r < rounds; r++) {
+        let tempShoe = [...shoe];
+        let result = playRound(tempShoe);
+        if (result === 'P') pWins++;
+        else if (result === 'B') bWins++;
+        else ties++;
+      }
+      return {pWins, bWins, ties};
+    }
+    function playRound(tempShoe) {
+      const drawCard = () => tempShoe.splice(Math.floor(Math.random()*tempShoe.length), 1)[0];
+      let p = [drawCard(), drawCard()];
+      let b = [drawCard(), drawCard()];
+      let pTotal = (p[0] + p[1]) % 10;
+      let bTotal = (b[0] + b[1]) % 10;
+      if (pTotal >= 8 || bTotal >= 8) {
+        // Natural win
+      } else {
+        if (pTotal <= 5) {
+          p.push(drawCard());
+          pTotal = p.reduce((a,c)=>a+c,0) % 10;
+        }
+        if (bTotal <= 5) {
+          b.push(drawCard());
+          bTotal = b.reduce((a,c)=>a+c,0) % 10;
+        }
+      }
+      if (pTotal > bTotal) return 'P';
+      if (bTotal > pTotal) return 'B';
+      return 'T';
+    }
+    function predict() {
+      const cardInput = document.getElementById('cards').value.trim().split(/\s+/).map(Number);
+      removeCards(cardInput);
+      let {pWins, bWins, ties} = simulate(2000);
+      let result;
+      if (pWins > bWins && pWins > ties) result = 'Prediction: Player';
+      else if (bWins > pWins && bWins > ties) result = 'Prediction: Banker';
+      else result = 'Prediction: Tie';
+      document.getElementById('result').innerText = `${result}\nP:${pWins} B:${bWins} T:${ties}`;
+    }
+    function resetShoe() {
+      initShoe();
+      document.getElementById('result').innerText = '';
+    }
+    initShoe();
+  </script></body>
 </html>
