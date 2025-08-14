@@ -1,30 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baccarat Tracker with Card Counting</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baccarat Predictor (Qumera-style)</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>Baccarat Tracker</h1>
-    <div class="scoreboard">
-        <div id="big-road" class="road"></div>
-        <div id="bead-plate" class="road"></div>
-    </div>
-    <div class="controls">
-        <button onclick="recordResult('P')">Player</button>
-        <button onclick="recordResult('B')">Banker</button>
-        <button onclick="recordResult('T')">Tie</button>
-        <button onclick="undo()">Undo</button>
-        <button onclick="resetGame()">Reset</button>
-    </div>
-    <div id="count-info">
-        <p>Remaining Cards: <span id="remaining-cards">0</span></p>
-        <p>Player %: <span id="player-percent">0</span>%</p>
-        <p>Banker %: <span id="banker-percent">0</span>%</p>
-        <p>Tie %: <span id="tie-percent">0</span>%</p>
-    </div>
-    <script src="script.js"></script>
+  <header class="topbar">
+    <h1>🃏 Baccarat Predictor</h1>
+    <div class="spacer"></div>
+    <a class="btn ghost" href="README.md" target="_blank">Help</a>
+  </header>
+
+  <main class="grid">
+    <!-- LEFT: controls -->
+    <section class="card">
+      <h2>Setup</h2>
+
+      <div class="row">
+        <label for="cardsTotal">Number of cards</label>
+        <select id="cardsTotal">
+          <option value="416">416 (8 decks)</option>
+          <option value="312">312 (6 decks)</option>
+          <option value="208">208 (4 decks)</option>
+          <option value="104">104 (2 decks)</option>
+          <option value="52">52 (1 deck)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="simRounds">Number of rounds (simulation)</label>
+        <input id="simRounds" type="range" min="200" max="5000" step="100" value="1500" />
+        <span id="simRoundsVal" class="mono">1 500</span>
+      </div>
+
+      <h3>Enter Playing Cards</h3>
+      <p class="hint">Use baccarat values: <b>0</b>=10/J/Q/K, <b>1</b>=A, <b>2-9</b>=2-9. Separate with space or type a long string.</p>
+      <textarea id="cardsInput" rows="3" placeholder="e.g. 0 3 6 7 10 → write as 0 3 6 7 0 (since 10 counts as 0)"></textarea>
+
+      <div class="pad">
+        <div class="keypad">
+          <button data-val="0">0</button>
+          <button data-val="1">1</button>
+          <button data-val="2">2</button>
+          <button data-val="3">3</button>
+          <button data-val="4">4</button>
+          <button data-val="5">5</button>
+          <button data-val="6">6</button>
+          <button data-val="7">7</button>
+          <button data-val="8">8</button>
+          <button data-val="9">9</button>
+          <button id="keyBack" class="warn">⌫</button>
+          <button id="keyClear" class="ghost">Clear</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="applyCards" class="btn primary">ENTER</button>
+        <button id="undoCard" class="btn ghost">Undo last card</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>Remaining in Shoe</span><b id="remaining">—</b></div>
+        <div class="stat"><span>Play Number</span><b id="playNum">0</b></div>
+      </div>
+    </section>
+
+    <!-- MIDDLE: odds + recommendation -->
+    <section class="card">
+      <h2>Odds (from current shoe)</h2>
+
+      <div class="odds">
+        <div class="odd"><span>Banker</span><b id="oddBanker">—</b></div>
+        <div class="odd"><span>Player</span><b id="oddPlayer">—</b></div>
+        <div class="odd"><span>Tie</span><b id="oddTie">—</b></div>
+      </div>
+
+      <div class="recommend">
+        <div class="label">Bet on:</div>
+        <div id="bestBet" class="best">—</div>
+        <div id="confidence" class="confidence">confidence: —</div>
+      </div>
+
+      <h3>All possible outcomes</h3>
+      <div id="allOutcomes" class="pillrow">
+        <span class="pill blue">Player</span>
+        <span class="pill red">Banker</span>
+        <span class="pill green">Tie</span>
+      </div>
+    </section>
+
+    <!-- RIGHT: history / bead plate -->
+    <section class="card">
+      <h2>History</h2>
+      <div class="row">
+        <button class="btn hist blue" data-res="P">Player</button>
+        <button class="btn hist red" data-res="B">Banker</button>
+        <button class="btn hist green" data-res="T">Tie</button>
+        <button id="undoRes" class="btn ghost">Undo</button>
+      </div>
+
+      <div id="historyText" class="mono dim">—</div>
+
+      <h3>Bead Plate</h3>
+      <div id="bead" class="bead"></div>
+    </section>
+  </main>
+
+  <footer class="foot dim">
+    <span>Made for quick baccarat analysis. For entertainment/education; no guarantees.</span>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
