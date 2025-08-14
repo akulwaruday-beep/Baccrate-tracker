@@ -1,4 +1,9 @@
-// ------------------------------
+function getSimulationCount(cardsRemaining, totalCards) {
+  const progress = 1 - cardsRemaining / totalCards; // 0 at start, 1 at end
+  const minSim = 500;  // fast early in the shoe
+  const maxSim = 5000; // super accurate near the end
+  return Math.round(minSim + (maxSim - minSim) * Math.pow(progress, 2));
+}/ ------------------------------
 // Baccarat Predictor (Qumera-style)
 // ------------------------------
 
