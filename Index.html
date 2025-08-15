@@ -1,361 +1,98 @@
-           <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Baccarat Tracker – Offline (8-Deck)</title>
-<style>
-  :root{
-    --bg:#0b0f14; --card:#121821; --text:#e6edf3; --muted:#9aa7b2;
-    --blue:#2a77ff; --red:#ff4258; --green:#2ecc71; --amber:#f0b429;
-    --ring:#2b3440;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu}
-  .wrap{max-width:900px;margin:auto;padding:16px}
-  h1{font-size:20px;margin:6px 0 12px}
-  .grid{display:grid;gap:12px}
-  @media(min-width:760px){ .grid{grid-template-columns:1fr 1fr} }
-  .card{background:var(--card);border:1px solid #1a2330;border-radius:16px;padding:12px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .col{flex:1 1 120px}
-  label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
-  select,button,input[type="number"]{
-    width:100%;padding:10px;border-radius:12px;border:1px solid #263040;background:#0e141b;color:var(--text);
-    outline:none;
-  }
-  select:focus,button:focus{box-shadow:0 0 0 3px var(--ring)}
-  button{font-weight:600;cursor:pointer}
-  .btn-primary{background:linear-gradient(180deg,#2e82ff,#1f5fe6);border:none}
-  .btn-ghost{background:#0e141b;border:1px solid #283244}
-  .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}
-  .b-blue{background:rgba(42,119,255,.15);color:var(--blue);border:1px solid rgba(42,119,255,.35)}
-  .b-red{background:rgba(255,66,88,.15);color:var(--red);border:1px solid rgba(255,66,88,.35)}
-  .b-green{background:rgba(46,204,113,.18);color:var(--green);border:1px solid rgba(46,204,113,.35)}
-  .stat{font-size:14px;color:var(--muted)}
-  .big{font-size:24px;font-weight:800}
-  .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #223049;border-radius:12px;padding:8px 10px}
-  .bar{height:10px;background:#1a2330;border-radius:999px;overflow:hidden}
-  .bar > span{display:block;height:100%}
-  .bar-blue{background:var(--blue)}
-  .bar-red{background:var(--red)}
-  .bar-green{background:var(--green)}
-  .history{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800}
-  .chip.blue{background:var(--blue)}
-  .chip.red{background:var(--red)}
-  .chip.green{background:var(--green)}
-  .muted{color:var(--muted)}
-  .note{font-size:12px;color:var(--muted)}
-</style>
+    <title>Baccarat Prediction App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b3d0b;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        input, select, button {
+            padding: 8px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #145214;
+            border-radius: 8px;
+        }
+        .slider-container {
+            margin-top: 20px;
+            background: #0d4d0d;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🎴 Baccarat Tracker (Offline, 8-Deck)</h1>
 
-  <div class="grid">
-    <!-- Inputs -->
-    <div class="card">
-      <h2 style="margin:0 0 10px;">Enter Dealt Cards</h2>
-      <div class="row">
-        <div class="col">
-          <label>Player 1</label>
-          <select id="p1"></select>
-        </div>
-        <div class="col">
-          <label>Player 2</label>
-          <select id="p2"></select>
-        </div>
-        <div class="col">
-          <label>Player 3 (if drawn)</label>
-          <select id="p3"></select>
-        </div>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <div class="col">
-          <label>Banker 1</label>
-          <select id="b1"></select>
-        </div>
-        <div class="col">
-          <label>Banker 2</label>
-          <select id="b2"></select>
-        </div>
-        <div class="col">
-          <label>Banker 3 (if drawn)</label>
-          <select id="b3"></select>
-        </div>
-      </div>
+<h1>Baccarat Prediction App</h1>
 
-      <div class="row" style="margin-top:12px">
-        <div class="col">
-          <button class="btn-primary" id="record">Record Hand</button>
-        </div>
-        <div class="col">
-          <button class="btn-ghost" id="clear">Clear Inputs</button>
-        </div>
-        <div class="col">
-          <button class="btn-ghost" id="reset">Reset Shoe (8-deck)</button>
-        </div>
-      </div>
-      <p class="note" style="margin-top:10px">Tip: You only need to enter the actual cards dealt in the hand. Leave unused slots blank.</p>
-    </div>
+<!-- Select total decks -->
+<label>Total Decks:</label>
+<select id="totalDecks">
+    <option value="8">8 Decks</option>
+    <option value="6">6 Decks</option>
+</select>
 
-    <!-- Shoe + Prediction -->
-    <div class="card">
-      <h2 style="margin:0 0 10px;">Shoe & Prediction</h2>
-      <div class="row" style="gap:12px">
-        <div class="pill"><span>Cards left:</span> <span class="big" id="cardsLeft">416</span></div>
-        <div class="pill"><span>Decks left:</span> <span class="big" id="decksLeft">8.00</span></div>
-      </div>
-
-      <div style="margin-top:14px">
-        <div class="row">
-          <div class="col">
-            <div class="stat">Next-hand prediction</div>
-            <div id="predBadge" class="badge b-blue" style="margin-top:6px">Player</div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px">
-          <div class="stat">Probabilities</div>
-          <div class="bar" title="Player"><span id="barP" class="bar-blue" style="width:33%"></span></div>
-          <div class="bar" style="margin-top:6px" title="Banker"><span id="barB" class="bar-red" style="width:33%"></span></div>
-          <div class="bar" style="margin-top:6px" title="Tie"><span id="barT" class="bar-green" style="width:34%"></span></div>
-          <div class="row" style="margin-top:6px">
-            <div class="col stat">P: <span id="pPct">33%</span></div>
-            <div class="col stat">B: <span id="bPct">33%</span></div>
-            <div class="col stat">T: <span id="tPct">34%</span></div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <div class="stat">Last 5 predictions</div>
-          <div id="hist" class="history" style="margin-top:6px"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:12px">
-    <h2 style="margin:0 0 8px;">How it works (offline)</h2>
-    <p class="muted">
-      The app tracks an 8-deck shoe. When you press <b>Record Hand</b>, it removes the chosen cards from the shoe.
-      For the next-hand prediction it runs a fast Monte-Carlo simulation (all on your device) using the current shoe
-      and the official drawing rules. The highest probability decides the color:
-      <span class="badge b-blue">Player</span>, <span class="badge b-red">Banker</span>, <span class="badge b-green">Tie</span>.
-    </p>
-  </div>
+<!-- Slider for shoe progress -->
+<div class="slider-container">
+    <label>Shoe Progress (% dealt): <span id="progressValue">0</span>%</label><br>
+    <input type="range" id="shoeProgress" min="0" max="100" value="0">
 </div>
 
+<!-- Input seen cards -->
+<p>Enter seen cards (e.g., A,K,5,3):</p>
+<input type="text" id="seenCards" placeholder="Type cards here">
+<button onclick="calculatePrediction()">Predict</button>
+
+<div id="output"></div>
+
 <script>
-/* ---------- Card & Shoe utilities ---------- */
-const RANKS = ["","A","2","3","4","5","6","7","8","9","10","J","Q","K"]; // index 1..13
-const RANK_TO_VALUE = {A:1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":0,J:0,Q:0,K:0};
-const rankList = RANKS.slice(1);
+function calculatePrediction() {
+    const totalDecks = parseInt(document.getElementById("totalDecks").value);
+    const progressPercent = parseInt(document.getElementById("shoeProgress").value);
+    const seenCards = document.getElementById("seenCards").value.split(",").map(c => c.trim().toUpperCase());
 
-function freshShoe(numDecks=8){
-  // counts[rank] = copies remaining across all suits/decks
-  const counts = {};
-  rankList.forEach(r => counts[r] = 4 * numDecks); // 4 of each rank per deck
-  return counts;
-}
-let shoe = freshShoe(8);
+    // Calculate remaining decks based on progress
+    const remainingDecks = totalDecks * ((100 - progressPercent) / 100);
 
-function totalCardsLeft(counts){
-  return Object.values(counts).reduce((a,b)=>a+b,0);
-}
+    // Card counts for probability calculation
+    const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+    let cardCount = {};
+    ranks.forEach(r => cardCount[r] = remainingDecks * 4); // 4 per deck
 
-/* ---------- UI helpers ---------- */
-function fillSelects(){
-  const opts = ['<option value="">—</option>']
-    .concat(rankList.map(r=>`<option value="${r}">${r}</option>`))
-    .join('');
-  ["p1","p2","p3","b1","b2","b3"].forEach(id=>{
-    document.getElementById(id).innerHTML = opts;
-  });
-}
-fillSelects();
+    // Remove seen cards
+    seenCards.forEach(card => {
+        if (cardCount[card] !== undefined && cardCount[card] > 0) {
+            cardCount[card]--;
+        }
+    });
 
-function updateShoeStats(){
-  const left = totalCardsLeft(shoe);
-  document.getElementById("cardsLeft").textContent = left;
-  document.getElementById("decksLeft").textContent = (left/52).toFixed(2);
-}
+    // Total remaining cards
+    const totalCardsRemaining = Object.values(cardCount).reduce((a,b) => a+b, 0);
 
-/* ---------- Record & Reset ---------- */
-function useCard(rank){
-  if(!rank) return true;
-  if(shoe[rank] > 0){ shoe[rank]--; return true; }
-  return false;
+    // Example probability: chance of next card being an Ace
+    const aceProbability = ((cardCount["A"] / totalCardsRemaining) * 100).toFixed(2);
+
+    // Output
+    document.getElementById("output").innerHTML = `
+        Remaining Decks: ${remainingDecks.toFixed(2)}<br>
+        Total Cards Remaining: ${totalCardsRemaining}<br>
+        Chance of next card being Ace: ${aceProbability}%
+    `;
 }
 
-function recordHand(){
-  const ranks = ["p1","p2","p3","b1","b2","b3"].map(id => document.getElementById(id).value);
-  // validate availability
-  const temp = {...shoe};
-  for(const r of ranks){
-    if(!r) continue;
-    if(temp[r] <= 0){ alert(`No ${r}s left in shoe.`); return; }
-    temp[r]--;
-  }
-  // commit
-  ranks.forEach(useCard);
-  clearInputs();
-  updateShoeStats();
-  runPrediction(); // update prediction after recording
-}
-
-function clearInputs(){
-  ["p1","p2","p3","b1","b2","b3"].forEach(id=>document.getElementById(id).value="");
-}
-
-function resetShoe(){
-  if(!confirm("Reset shoe to fresh 8-deck?")) return;
-  shoe = freshShoe(8);
-  updateShoeStats();
-  historyChips.length = 0;
-  renderHistory();
-  runPrediction();
-}
-
-/* ---------- Baccarat dealing & rules ---------- */
-function modulo10(n){ return ((n%10)+10)%10; }
-function valueOf(rank){ return RANK_TO_VALUE[rank]; }
-
-/* Draw from a mutable counts object (simulation copy) */
-function drawSim(counts){
-  const total = totalCardsLeft(counts);
-  if(total<=0) return null;
-  let r = Math.floor(Math.random()*total)+1;
-  for(const rank of rankList){
-    r -= counts[rank];
-    if(r<=0){ counts[rank]--; return rank; }
-  }
-  return null;
-}
-
-function handTotal(cards){
-  const sum = cards.reduce((a,c)=>a + valueOf(c),0);
-  return modulo10(sum);
-}
-
-function simulateRound(countsCopy){
-  // initial two cards each
-  const p = [drawSim(countsCopy), drawSim(countsCopy)];
-  const b = [drawSim(countsCopy), drawSim(countsCopy)];
-  const pTot = handTotal(p);
-  const bTot = handTotal(b);
-
-  // Naturals
-  if(pTot>=8 || bTot>=8){
-    return decideWinner(pTot,bTot);
-  }
-
-  // Player draw
-  let p3 = null;
-  if(pTot<=5){
-    p3 = drawSim(countsCopy);
-    p.push(p3);
-  }
-
-  // Banker draw rules
-  let b3 = null;
-  const bNow = handTotal(b);
-  if(p3===null){
-    if(bNow<=5) { b3 = drawSim(countsCopy); b.push(b3); }
-  }else{
-    const pv = valueOf(p3);
-    if(bNow<=2){ b3 = drawSim(countsCopy); b.push(b3); }
-    else if(bNow===3 && pv!==8){ b3 = drawSim(countsCopy); b.push(b3); }
-    else if(bNow===4 && (pv>=2 && pv<=7)){ b3 = drawSim(countsCopy); b.push(b3); }
-    else if(bNow===5 && (pv>=4 && pv<=7)){ b3 = drawSim(countsCopy); b.push(b3); }
-    else if(bNow===6 && (pv===6 || pv===7)){ b3 = drawSim(countsCopy); b.push(b3); }
-    // else stand
-  }
-
-  const pt = handTotal(p);
-  const bt = handTotal(b);
-  return decideWinner(pt,bt);
-}
-
-function decideWinner(pTot,bTot){
-  if(pTot===bTot) return "T";
-  return (pTot>bTot) ? "P" : "B";
-}
-
-/* ---------- Monte-Carlo Prediction ---------- */
-function predictNext(simulations=2000){
-  // if shoe is too low, fallback smaller sims
-  const left = totalCardsLeft(shoe);
-  const sims = Math.min(simulations, Math.max(200, Math.floor(left*4)));
-  let p=0,b=0,t=0;
-  for(let i=0;i<sims;i++){
-    // clone counts
-    const copy = {};
-    for(const r of rankList) copy[r]=shoe[r];
-    const res = simulateRound(copy);
-    if(res==="P") p++; else if(res==="B") b++; else t++;
-  }
-  const sum = p+b+t || 1;
-  return { p: p/sum, b: b/sum, t: t/sum };
-}
-
-/* ---------- Rendering prediction ---------- */
-const predBadge = document.getElementById("predBadge");
-const bars = { P: document.getElementById("barP"),
-               B: document.getElementById("barB"),
-               T: document.getElementById("barT") };
-const pctLabels = { P: document.getElementById("pPct"),
-                    B: document.getElementById("bPct"),
-                    T: document.getElementById("tPct") };
-
-const historyChips = [];
-function renderHistory(){
-  const box = document.getElementById("hist");
-  box.innerHTML = "";
-  historyChips.slice(-5).forEach(x=>{
-    const d = document.createElement("div");
-    d.className = "chip "+(x==="P"?"blue":x==="B"?"red":"green");
-    d.textContent = x;
-    box.appendChild(d);
-  });
-}
-
-function setBadge(who){
-  const map = {
-    P: {text:"Player", cls:"badge b-blue"},
-    B: {text:"Banker", cls:"badge b-red"},
-    T: {text:"Tie",    cls:"badge b-green"}
-  };
-  predBadge.textContent = map[who].text;
-  predBadge.className = map[who].cls;
-}
-
-function runPrediction(){
-  const probs = predictNext();
-  const p = probs.p, b = probs.b, t = probs.t;
-  const winner = (p>=b && p>=t) ? "P" : (b>=p && b>=t) ? "B" : "T";
-
-  // bars & labels
-  bars.P.style.width = Math.round(p*100)+"%";
-  bars.B.style.width = Math.round(b*100)+"%";
-  bars.T.style.width = Math.round(t*100)+"%";
-  pctLabels.P.textContent = Math.round(p*100)+"%";
-  pctLabels.B.textContent = Math.round(b*100)+"%";
-  pctLabels.T.textContent = Math.round(t*100)+"%";
-
-  setBadge(winner);
-  historyChips.push(winner);
-  if(historyChips.length>5) historyChips.splice(0, historyChips.length-5);
-  renderHistory();
-}
-
-/* ---------- Wire up ---------- */
-document.getElementById("record").addEventListener("click", recordHand);
-document.getElementById("clear").addEventListener("click", clearInputs);
-document.getElementById("reset").addEventListener("click", resetShoe);
-updateShoeStats();
-runPrediction();
+// Update slider label in real time
+document.getElementById("shoeProgress").addEventListener("input", function() {
+    document.getElementById("progressValue").innerText = this.value;
+});
 </script>
+
 </body>
-</html> 
+           </html>
